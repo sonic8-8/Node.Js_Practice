@@ -1,0 +1,18 @@
+body {
+    margin: 0;
+}
+
+.navbar_container {
+    display: flex;
+    padding: 15px;
+    align-items: center;
+    background : white;
+}
+
+.navbar_a {
+    margin: 10px;
+}
+
+.navbar_logo {
+    font-weight: bold;
+}

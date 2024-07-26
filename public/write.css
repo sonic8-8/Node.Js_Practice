@@ -1,0 +1,25 @@
+
+.form_box {
+    background : white;
+    padding : 25px;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.form_input {
+    padding : 10px;
+    font-size: 16px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.form_button {
+    padding: 10px;
+    border : none;
+    background : lightgrey;
+    border-radius: 5px;
+    box-sizing: border-box;
+}

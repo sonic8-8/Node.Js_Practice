@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/main.css" rel="stylesheet">
+</head>
+<body class="grey_bg">
+
+    <%- include('navbar.ejs') %>
+
+    <div class="detail_container">
+        <h4><%= 글.title %></h4>
+        <p><%= 글.content %></p>
+    </div>
+
+    <!-- <div class="detail_container">
+        <h4>글제목</h4>
+        <p>글내용</p>
+    </div> -->
+
+</body>
+</html>

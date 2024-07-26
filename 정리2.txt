@@ -1,0 +1,189 @@
+part2
+
+1강 글 작성기능 만들기 ( POST 요청 )
+
+1. 유저가 작성한 글 서버에 전송하기
+2. 서버에서 검사
+3. 이상 없으면 DB에 저장
+
+server.js에 /write 로 접속하면 write.ejs를 보내주도록 API 만들기
+write.ejs에 글 작성 기능 개발 ( form태그로 작성함 )
+server.js에서 전송받은 데이터 검사하기
+    근데 여기서 쉽게 전송받기 위해 2가지 세팅이 필요합니다
+    (1) app.use(express.json())
+    (2) app.use(express.urlencoded({extended:true}))
+    server.js 상단에 위 2가지 세팅 추가해주시면 됨
+    그럼 이제 요청.body로 데이터 받을 수 있음
+DB에 저장하기
+    db.collection('컬렉션명').insertOne({ name : value , name : value })
+    아니면 insertMany([ { name : value, name : value }, { ~~ } ])를 사용해서 저장하면 됨
+
+--------------------------------------------------------
+
+2강
+
+서버 정상 동작하는지 검사하기 : try-catch문 사용
+검사 로직 if문으로 작성하고
+다 통과하면 저장하기
+
+redirect 문법으로 입력 요청 처리 후 페이지 이동시킬 수 있습니다.
+
+--------------------------------------------------------
+
+3강 상세 페이지 만들기 (URL parameter)
+
+/detail/0, /detail/1, /detail/2, /detail/3
+이런식으로 URL에 맞는 API를 4개 만들고 ejs 파일 4개를 만들면 상세페이지 만들기 끝입니다.
+근데 이런거 100만개 있으면 어떻게 할건가요
+파일 100만개를 만드실겁니까 그래도 되겠지만
+이런식으로 하드 코딩하지말고 URL parameter를 이용해서 중복을 제거해봅시다.
+
+render() 메서드는 ejs 파일이랑 함께 데이터를 전송할 수 있다고 했으니까 이를 이용하면 되겠는데요
+/detail 로 접속하면 detail.ejs 파일을 보내주도록 API를 하나 만들고
+데이터를 함께 전송해봅시다
+
+URL을 입력할때 /: 를 넣어주시면 됨
+app.get('/detail/:aaaa', () => {})
+
+상세 페이지 기능 구현 (잘개 쪼개기)
+(1) 유저가 /detail/어쩌구 입력하기
+(2) { _id : 어쩌구 } 글을 DB에서 찾기
+(3) ejs 파일에 박아서 보내주기
+
+server.js 상단에 세팅도 추가로 해줘야합니다.
+const { MongoClient, ObjectId } = require('mongodb'); 
+를 추가하십쇼.
+
+특정한 파일을 찾아오게 하면 되는데 findOne() 메서드를 사용하면 됩니다.
+db.collection('컬렉션명').findOne({ key : value });
+
+여기서 MongoDB를 직접 살펴보면 document의 id는
+_id : ObjectId('') 형태로 되어있습니다.
+
+이걸 왜 언급하냐면 URL parameter로 입력한 값을
+요청.params 라는 문법으로 가져올 수 있기 때문인데
+요청.params를 console.log()로 출력해보면
+
+위 예시에서는 /detail/:aaaa 라고 해놔서
+{ aaaa : '사용자가 입력한 값' } 이 나옵니다.
+
+추가로 _id를 이용해서 document를 가져오기 위해선
+ObjectId()라는 메서드로 꺼내와야합니다.
+
+다시 말해서 { _id : new ObjectId(_id의 value) } 로 꺼내와야한다는 것임
+그럼 URL parameter와 연결해서 생각해봅시다.
+/detail/:_id 로 URL을 변경하면
+{ _id : '사용자가 입력한 값' } 가 되니까
+요청.params._id는 '사용자가 입력한 값'이 됩니다.
+
+나머지도 구현해봅시다.
+
+--------------------------------------------------------
+
+4강 상세 페이지 만들기 (링크)
+
+이번엔 list.ejs에서 제목을 누르면 detail.ejs 이동하는 링크를 만들어봅시다
+
+a 태그를 사용하면 되겠네요.
+
+힌트를 한가지 더 드리자면
+list.ejs에 글목록이라는 이름으로 데이터를 받아왔었습니다.
+<%= JSON.stringify(글목록) %>로 안쪽 내용을 확인해보면
+당연히 _id도 들어있습니다.
+
+이걸 이용하면 링크를 만들 수 있구요.
+네비게이션 바에도 이제 링크를 만들어봅시다
+
+예외처리도 만들어줍시다. URL parameter에 이상한 걸 입력하면 어떡할겁니까
+서버가 다운될 수 있으니 막아줘야겠죠
+이를 위해서 try-catch 문을 이용해봅시다.
+
+근데 try-catch문만으로는 모든 예외처리가 되진 않습니다.
+그렇기 때문에 일부러 이상한 짓거리를 해보고 오류가 발생하면 거기에 대응하는 코드를 작성해봅시다
+
+--------------------------------------------------------
+
+5강 수정 기능 만들기
+
+로직 쪼개기
+(1) 수정 버튼 누르면 수정 페이지로 이동
+(2) 수정 페이지에는 기존 글이 채워져있음
+(3) 전송 누르면 입력한 내용으로 DB 글 수정
+
+input의 value 속성을 이용해서 값을 미리 채워져있는 상태를 만들어봅시다.
+
+mongoDB 라이브러리
+updateOne( {수정할 documnet 정보}, $set : {덮어 쓸 내용} ) 메서드를 이용해서 수정하면 됩니다.
+
+서버에서 정보를 찾을 수 없을때 해결법
+(1) 유저에게 보내라고 하기
+(2) DB에서 찾아보기
+
+참고로 put이나 delete 요청을 보내면 좋다고 했었는데
+form 태그에서는 이를 지원하지 않습니다. get, post만 가능함
+만약 사용하고 싶다면 라이브러리나 AJAX를 사용해야합니다
+
+그리고 server.js에서 form 태그로 보낸 데이터는 요청.body로 받을 수 있습니다.
+
+--------------------------------------------------------
+
+6강 수정 기능 만들기 ( method-override, MongoDB 수정문법 추가 )
+
+put요청이나 delete 요청을 하고 싶으십니까
+method-override 를 사용하면 할 수 있습니다.
+이를 위해 method-override 라이브러리를 먼저 설치해봅시다.
+
+그리고 server.js에 세팅을 해주면 됩니다.
+
+const methodOverride = require('method-override');
+
+app.use(methodOverride('_method'));
+
+이제 실제로 사용해봅시다.
+전에 만들었던 수정 기능을 put 요청으로 바꿔봅시다.
+
+2개의 수정이 필요할 것 같습니다.
+(1) server.js
+(2) edit.ejs
+
+먼저 server.js 파일은
+app.post()를 app.put()으로 바꾸면 됩니다.
+
+그런데 edit.ejs에서는
+form태그에 method를 put으로 바꾼다고 put 요청으로 바뀌는게 아닙니다.
+method는 post로 그대로 둔 상태에서
+action 속성에 ?_method=PUT 을 추가하셔야 put 요청으로 바꿀 수 있습니다.
+
+문법
+(1) $set : 덮어쓰기
+(2) $inc : increase 덧셈 ( 뺄셈도 가능함 음수 더하면 됨 )
+    db.collection(컬렉션명).updateOne( {찾을 데이터}, { $inc : {양수 or 음수} } )
+(3) $mul : multiply 곱셈
+(4) $unset : 필드값 삭제
+    이건 거의 쓰지 않기 때문에 알고만 있으면 됩니다.
+
+수정 메서드
+(1) updateOne : 
+(2) updateMany : 여러 documnet를 수정하고 싶다면 쓰면 됩니다.
+
+updateMany 메서드를 사용할때 만약 10보다 큰 범위를 주고싶다면 어떻게 해야할까요
+updateMany( { like > 10 } ) 이런게 되면 좋겠는데 이런 문법은 존재하지 않구요
+SQL문을 사용할땐 저런식으로 사용하겠지만 MongoDB니까 다른 방식을 사용해야합니다
+
+greater than을 줄여서 $gt라는 문법을 쓰면 되는데
+구체적으로 보여드리면
+updateMany( { like : { $gt : 10 } } ) 이렇게 사용하시면 됩니다.
+그리고 사실 이런 문법에 이름이 있는데 필터링이라고 부릅니다.
+
+필터링
+(1) $gt : greater than
+(2) $gte : greater than equal
+(3) $lt : less than
+(4) $lte : less than equal
+(5) $ne : not equal
+
+줄임말이기 때문에 직관적으로 여러 document를 필터링 할 수 있습니다
+근데 이걸 외우기보다는 자주 보고 익숙해지시면 되고 필요할때 검색해서 찾아보는게 효율적일 수 있습니다.
+
+--------------------------------------------------------
+

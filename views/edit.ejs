@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="/main.css" rel="stylesheet">
+</head>
+<body>
+
+    <%- include('navbar.ejs') %>
+
+    <div class="form_container">
+        <form action="/edit/<%= 글._id %>?_method=PUT" method="post">
+            <input name="title" value="<%= 글.title %>">
+            <input name="content" value="<%= 글.content %>">
+            <button type="submit">수정하기</button>
+        </form>
+    </div>
+
+</body>
+</html>
